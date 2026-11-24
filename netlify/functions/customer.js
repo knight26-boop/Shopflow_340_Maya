@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const { getConnection } = require('./lib/db');
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,18 +33,7 @@ exports.handler = async (event) => {
     let connection;
 
     try {
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: Number(process.env.DB_PORT),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            dateStrings: true,
-            ssl: {
-                ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'),
-                rejectUnauthorized: true
-            }
-        });
+        connection = await getConnection();
 
         // Only the fields the page displays are selected
         const [rows] = await connection.execute(
@@ -61,7 +50,7 @@ exports.handler = async (event) => {
             body: JSON.stringify(rows[0] || null)
         };
     } catch (error) {
-        console.error('Lookup error:', error);
+        console.error('Lookup error:', error.code, error.message);
         return {
             statusCode: 500,
             headers,
