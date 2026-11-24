@@ -84,3 +84,15 @@ async function tryConnect() {
       name: err.name,
       message: String(err.message).slice(0, 200),
     };
+  }
+  return result;
+}
+
+exports.handler = async () => {
+  const body = { variables: inspectVars(), connection: await tryConnect() };
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body, null, 2),
+  };
+};
