@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopFlow Store | CISS 340 Project</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>ShopFlow Store</h1>
+        <nav>
+            <a href="#products">Products</a>
+            <a href="#analytics">Analytics</a>
+            <a href="#customer-lookup">Customers</a>
+            <a href="#about">About</a>
+        </nav>
+    </header>
+
+    <div class="notice" role="note">
+        <strong>CISS 340 class project.</strong> All data on this site is realistic, instructor-provided
+        <strong>fictional</strong> data. There are no real customers, orders or contact details.
+    </div>
+
+    <main>
+        <!-- SEARCH AND FILTER SECTION -->
+        <section id="search-section">
+            <h2>Search & Filter</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search products...">
+                <button onclick="searchProducts()" class="btn">Search</button>
+                
+                <!-- Options are filled in from the products the database returns -->
+                <select id="category-filter" onchange="filterByCategory()">
+                    <option value="">All Categories</option>
+                </select>
+                
+                <select id="price-filter" onchange="filterByPrice()">
+                    <option value="">All Prices</option>
+                    <option value="0-50">Under $50</option>
+                    <option value="50-100">$50 - $100</option>
+                    <option value="100+">Over $100</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- PRODUCTS DISPLAY -->
+        <section id="products">
+            <h2>Products Catalog</h2>
+            <div id="product-list" class="product-grid">
+                <div class="loading">Loading products...</div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS DASHBOARD -->
+        <section id="analytics">
+            <h2>Business Analytics</h2>
+            <div class="query-buttons">
+                <button onclick="getTopProducts()" class="btn">Top Products</button>
+                <button onclick="getCustomerSegments()" class="btn">Customer Segments</button>
+                <button onclick="getRevenueByCategory()" class="btn">Revenue Analysis</button>
+                <button onclick="getOrderStatus()" class="btn">Order Status</button>
+            </div>
+            <div id="analytics-result"></div>
+        </section>
+
+        <!-- CUSTOMER LOOKUP -->
+        <section id="customer-lookup">
+            <h2>Customer Lookup</h2>
+            <div class="form-group">
+                <input type="email" id="customer-email" placeholder="Enter customer email">
+                <button onclick="lookupCustomer()" class="btn">Find Customer</button>
+            </div>
+            <div id="customer-result"></div>
+        </section>
+
+        <!-- ABOUT THIS PROJECT (DRAFT: rewrite in your own words before submitting) -->
+        <section id="about">
+            <h2>About This Project</h2>
+            <p>ShopFlow is a CISS 340 database analytics project. Every record shown here is realistic,
+               instructor-provided fictional data.</p>
+
+            <h3>How data reaches this page</h3>
+            <p>Browser &rarr; Netlify page &rarr; Netlify Function/API &rarr; Aiven MySQL &rarr; JSON &rarr; Browser.
+               The browser never connects to the database. Each Netlify Function uses a read-only account
+               (<code>shopflow_reader</code>, SELECT access only) and runs approved, parameterized queries over a
+               verified TLS connection. The function returns JSON, and this page turns it into what you see.</p>
+
+            <h3>The database</h3>
+            <p>Seven tables: <code>customers</code>, <code>products</code>, <code>orders</code>,
+               <code>order_items</code>, <code>reviews</code>, <code>abandoned_carts</code> and
+               <code>support_tickets</code>. Customers place orders, and each order has order items that point to
+               products. Reviews link a customer to a product. Abandoned carts and support tickets belong to a
+               customer, and a ticket can optionally point to an order.</p>
+
+            <h3>Cleaning before loading</h3>
+            <ul>
+                <li>The text "NULL" became a real NULL, and nothing missing was filled in.</li>
+                <li>Phone numbers were put in one format, emails were lower-cased, and dates became ISO dates.</li>
+                <li>TRUE/FALSE text became real Boolean values.</li>
+                <li>Parents were loaded before children, and the load finished with no orphan rows.</li>
+            </ul>
+
+            <h3>Selected results and how they were checked</h3>
+            <ul>
+                <li><strong>Products:</strong> active products only. The count matches the notebook's count of active products.</li>
+                <li><strong>Top Products:</strong> Delivered revenue (quantity &times; unit price). Matches the notebook's product performance query.</li>
+                <li><strong>Customer Segments:</strong> Delivered revenue and orders by segment match the notebook's segmentation query.
+                    The Customers column counts all active customers in each segment, not only those who bought.</li>
+                <li><strong>Revenue Analysis:</strong> Delivered revenue by category. The categories add up to the notebook's Delivered revenue total.</li>
+                <li><strong>Order Status:</strong> counts match the notebook's fulfillment query. "Order value" adds up
+                    total_amount (including tax and shipping), so it is not revenue.</li>
+            </ul>
+            <p>The complete analysis (all 10 queries and 5 interactive charts) is in the executed notebook.
+               This site shows selected views only.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ShopFlow - CISS 340 Database Project</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
