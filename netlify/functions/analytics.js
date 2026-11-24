@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const { getConnection } = require('./lib/db');
 
 // Selected read-only views. Revenue = Delivered orders only, quantity * unit_price at the
 // order-item grain (same definition as the notebook). No reviews or tickets are joined in.
@@ -77,18 +77,7 @@ exports.handler = async (event) => {
     let connection;
 
     try {
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: Number(process.env.DB_PORT),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            dateStrings: true,
-            ssl: {
-                ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'),
-                rejectUnauthorized: true
-            }
-        });
+        connection = await getConnection();
 
         const [rows] = await connection.execute(QUERIES[queryType]);
 
@@ -98,7 +87,7 @@ exports.handler = async (event) => {
             body: JSON.stringify(rows)
         };
     } catch (error) {
-        console.error('Analytics error:', error);
+        console.error('Analytics error:', error.code, error.message);
         return {
             statusCode: 500,
             headers,
