@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const { getConnection } = require('./lib/db');
 
 exports.handler = async (event) => {
     const headers = {
@@ -12,18 +12,7 @@ exports.handler = async (event) => {
     let connection;
 
     try {
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: Number(process.env.DB_PORT),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            dateStrings: true,   // DATE values stay plain text such as 2023-01-15
-            ssl: {
-                ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'),
-                rejectUnauthorized: true
-            }
-        });
+        connection = await getConnection();
 
         // Parameterized, read-only query: active products only
         const [rows] = await connection.execute(
@@ -37,7 +26,7 @@ exports.handler = async (event) => {
             body: JSON.stringify(rows)
         };
     } catch (error) {
-        console.error('Database error:', error);
+        console.error('Database error:', error.code, error.message);
         return {
             statusCode: 500,
             headers,
