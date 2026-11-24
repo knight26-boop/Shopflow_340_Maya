@@ -33,8 +33,16 @@ function inspectVars() {
   return report;
 }
 
-function normalizeCert(v) {
-  return v ? v.replace(/\\n/g, "\n").trim() : undefined;
+function normalizeCert(raw) {
+  if (!raw) return undefined;
+  const text = raw.replace(/\\n/g, "\n");
+  const certs = text
+    .split(CERT_BEGIN)
+    .slice(1)
+    .map((block) => block.split(CERT_END)[0].replace(/\s+/g, ""))
+    .filter(Boolean)
+    .map((body) => CERT_BEGIN + "\n" + body.match(/.{1,64}/g).join("\n") + "\n" + CERT_END + "\n");
+  return certs.join("");
 }
 
 async function tryConnect() {
